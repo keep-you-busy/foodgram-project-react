@@ -55,7 +55,8 @@ class Tag(models.Model):
     name = models.CharField(
         verbose_name='Наименование тега',
         unique=True,
-        null=False
+        null=False,
+        blank=False
     ),
     color = models.CharField(
         verbose_name='Цвет тега',
@@ -65,5 +66,26 @@ class Tag(models.Model):
         'slug',
         max_length=50,
         unique=True,
+        blank=False,
         db_index=True
+    )
+
+class Ingredient(models.Model):
+    "Модель ингредиента."
+
+    name = models.CharField(
+        verbose_name='Наименование ингредиента',
+        unique=True,
+        null=False,
+        blank=False
+    ),
+    count = models.IntegerField(
+        verbose_name='Количество ингредиента',
+        null=False,
+        blank=False
+    )
+    measures = models.CharField(
+        verbose_name='Единица измерения ингредиента',
+        null=False,
+        blank=False
     )
