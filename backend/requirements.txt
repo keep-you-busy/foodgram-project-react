@@ -9,3 +9,5 @@ PyJWT==2.1.0
 requests==2.26.0
 python-dotenv
 psycopg2-binary==2.9.3
+djoser==2.1.0
+PyYAML==6.0
