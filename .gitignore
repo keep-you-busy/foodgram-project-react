@@ -139,6 +139,7 @@ dmypy.json
 
 # папки со статикой и медиа
 media/
+images/
 
 # Others
 node_modules
