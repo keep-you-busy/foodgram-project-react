@@ -88,6 +88,7 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
+        through='TagRecipe',
         verbose_name='Теги рецепта',
     )
     cooking_time = models.DurationField(
@@ -101,7 +102,11 @@ class Recipe(models.Model):
         return f'{self.name}'
 
 class IngredientRecipe(models.Model):
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.PROTECT)
+    ingredient = models.ForeignKey(
+        Ingredient,
+        verbose_name='Ингредиент',
+        on_delete=models.PROTECT
+    )
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     quantity = models.DecimalField(
         verbose_name='Количество',
@@ -115,7 +120,11 @@ class IngredientRecipe(models.Model):
         return f'{self.ingredient} {self.recipe}'
 
 class TagRecipe(models.Model):
-    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+    tag = models.ForeignKey(
+        Tag,
+        verbose_name='Тег',
+        on_delete=models.PROTECT
+    )
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
