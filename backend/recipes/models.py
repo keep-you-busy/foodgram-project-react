@@ -9,15 +9,12 @@ class Tag(models.Model):
         verbose_name='Наименование тега',
         unique=True,
         max_length=250,
-        null=False,
         blank=False,
-        default='Инициализирующий тег'
     )
     color = models.CharField(
         verbose_name='Цвет тега',
         unique=True,
         max_length=7,
-        default=None
     )
     slug = models.SlugField(
         'slug',
@@ -37,14 +34,11 @@ class Ingredient(models.Model):
         verbose_name='Наименование ингредиента',
         unique=True,
         max_length=250,
-        null=False,
         blank=False,
-        default='Инициализирующий ингредиент'
     )
     measures = models.CharField(
         verbose_name='Единица измерения ингредиента',
         max_length=50,
-        null=False,
         blank=False
     )
 
@@ -65,7 +59,6 @@ class Recipe(models.Model):
     name = models.CharField(
         verbose_name='Наименование рецепта',
         max_length=256,
-        null=False,
         blank=False
     )
     image = models.ImageField(
