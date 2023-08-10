@@ -1,9 +1,17 @@
 from django.contrib import admin
 from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag, TagRecipe
 
-admin.site.register(Ingredient)
-admin.site.register(Tag)
 
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'measures',
+    )
+    search_fields = (
+        'name',
+    )
+    empty_value_display = '-пусто-'
 
 class IngredientRecipeInline(admin.TabularInline):
     model = IngredientRecipe
@@ -18,11 +26,14 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'author',
         'name',
-        'image',
-        'text',
         'get_tags',
         'get_ingredients',
-        'cooking_time'
+        'get_favorites'
+    )
+    search_fields = (
+        'author__username',
+        'name',
+        'tags__name',
     )
     empty_value_display = '-пусто-'
     inlines = [IngredientRecipeInline, TagRecipeInline]
@@ -37,5 +48,12 @@ class RecipeAdmin(admin.ModelAdmin):
             ingredient.name for ingredient in recipe.ingredients.all()
         )
 
+    def get_favorites(self, recipe):
+        return recipe.in_favorites.count()
+
     get_tags.short_description = 'Теги'
     get_ingredients.short_description = 'Ингредиенты'
+    get_favorites.short_description = 'В избранных'
+
+
+admin.site.register(Tag)
