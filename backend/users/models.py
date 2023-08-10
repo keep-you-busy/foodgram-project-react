@@ -5,6 +5,7 @@ from django.db import models
 
 class User(AbstractUser):
     """Модель пользователя."""
+
     username_validator = ASCIIUsernameValidator()
 
     email = models.EmailField(
@@ -22,28 +23,24 @@ class User(AbstractUser):
         unique=True,
         validators=[username_validator],
         blank=False,
-        null=False
     )
     first_name = models.CharField(
         verbose_name='Имя',
         help_text=('Обазятельно для заполнения, не более 150 символов.'),
         max_length=150,
         blank=False,
-        null=False
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
         help_text=('Обазятельно для заполнения, не более 150 символов.'),
         max_length=150,
         blank=False,
-        null=False
     )
     password = models.CharField(
         verbose_name='Пароль',
         help_text=('Обазятельно для заполнения, не более 150 символов.'),
         max_length=150,
         blank=False,
-        null=False
     )
 
     REQUIRED_FIELDS = [
@@ -51,8 +48,37 @@ class User(AbstractUser):
     ]
 
     class Meta:
-        verbose_name = 'Пользователь',
-        verbose_name_plural = 'Пользователи',
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self) -> str:
         return self.username
+
+
+class Follow(models.Model):
+    """Модель подписок."""
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Автор'
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'], name="unique_author_user"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f'{self.user.username}: {self.author.username}'
