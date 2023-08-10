@@ -24,8 +24,13 @@ class Tag(models.Model):
         db_index=True
     )
 
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
     def __str__(self) -> str:
         return f'{self.name}'
+
 
 class Ingredient(models.Model):
     """Модель ингредиента."""
@@ -42,19 +47,25 @@ class Ingredient(models.Model):
         blank=False
     )
 
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
     def __str__(self) -> str:
         return f'{self.name}'
+
 
 class Recipe(models.Model):
     """Модель рецепта."""
 
     author = models.ForeignKey(
-        User, related_name='recipe',
+        User,
+        related_name='recipes',
         verbose_name='Автор рецепта',
         on_delete=models.CASCADE,
         null=False,
         blank=False,
-        default=0
+        default=0,
     )
     name = models.CharField(
         verbose_name='Наименование рецепта',
@@ -78,11 +89,13 @@ class Recipe(models.Model):
         Ingredient,
         through='IngredientRecipe',
         verbose_name='Ингредиенты рецепта',
+        related_name='recipes'
     )
     tags = models.ManyToManyField(
         Tag,
         through='TagRecipe',
         verbose_name='Теги рецепта',
+        related_name='recipes'
     )
     cooking_time = models.DurationField(
         verbose_name='Время готовки рецепта',
@@ -91,10 +104,17 @@ class Recipe(models.Model):
         default=0
     )
 
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+
     def __str__(self) -> str:
         return f'{self.name}'
 
+
 class IngredientRecipe(models.Model):
+    """Промежуточная сущность между моделями рецептов и ингредиентов."""
+
     ingredient = models.ForeignKey(
         Ingredient,
         verbose_name='Ингредиент',
@@ -110,15 +130,50 @@ class IngredientRecipe(models.Model):
     )
 
     def __str__(self) -> str:
-        return f'{self.ingredient} {self.recipe}'
+        return f'{self.ingredient}: {self.recipe}'
+
 
 class TagRecipe(models.Model):
+    """Промежуточная сущность между моделями рецептов и тегов."""
+
     tag = models.ForeignKey(
         Tag,
         verbose_name='Тег',
         on_delete=models.PROTECT
     )
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self) -> str:
-        return f'{self.tag} {self.recipe}'
+        return f'{self.tag}: {self.recipe}'
+
+
+class Favorites(models.Model):
+    """Модель избранных рецептов."""
+
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        related_name='favorites',
+        on_delete=models.CASCADE,
+    )
+    recipes = models.ForeignKey(
+        Recipe,
+        verbose_name='Любимые рецепты',
+        related_name='in_favorites',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipes'], name="unique_recipes_user"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f'{self.user.username}: {self.recipes.name}'
