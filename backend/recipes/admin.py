@@ -6,7 +6,7 @@ from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag, TagRecipe
 class IngredientAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'measures',
+        'measurement_unit',
     )
     search_fields = (
         'name',
