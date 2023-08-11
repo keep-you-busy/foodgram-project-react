@@ -1,3 +1,4 @@
+from core.user_validation import check_username
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.db import models
@@ -43,9 +44,16 @@ class User(AbstractUser):
         blank=False,
     )
 
+    USERNAME_FIELD = 'username'
+
     REQUIRED_FIELDS = [
         'email', 'first_name', 'last_name', 'password'
     ]
+
+    def clean(self):
+        super().clean()
+        check_username(value=self.username)
+
 
     class Meta:
         verbose_name = 'Пользователь'
