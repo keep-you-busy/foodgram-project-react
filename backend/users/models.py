@@ -1,4 +1,6 @@
 from core.user_validation import check_username
+from django.contrib.auth import password_validation
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.db import models
@@ -44,15 +46,22 @@ class User(AbstractUser):
         blank=False,
     )
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = [
-        'email', 'first_name', 'last_name', 'password'
+        'username', 'first_name', 'last_name', 'password'
     ]
 
     def clean(self):
         super().clean()
         check_username(value=self.username)
+
+    def save(self, *args, **kwargs):
+        self.password = make_password(self.password)
+        super().save(*args, **kwargs)
+        if self._password is not None:
+            password_validation.password_changed(self._password, self)
+            self._password = None
 
 
     class Meta:
