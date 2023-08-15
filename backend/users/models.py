@@ -56,13 +56,6 @@ class User(AbstractUser):
         super().clean()
         check_username(value=self.username)
 
-    def save(self, *args, **kwargs):
-        self.password = make_password(self.password)
-        super().save(*args, **kwargs)
-        if self._password is not None:
-            password_validation.password_changed(self._password, self)
-            self._password = None
-
 
     class Meta:
         verbose_name = 'Пользователь'
