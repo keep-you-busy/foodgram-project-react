@@ -1,10 +1,10 @@
-from django.contrib.auth.hashers import make_password
-from recipes.models import Ingredient, Recipe, Tag
+from djoser.serializers import UserSerializer
+from recipes.models import Favorites, Ingredient, Recipe, Tag
 from rest_framework import serializers
 from users.models import Follow, User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
     password = serializers.CharField(
         write_only=True, style={'input_type': 'password'}
