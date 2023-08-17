@@ -84,7 +84,46 @@ class RecipeSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Favorites.objects.filter(user=user, author=obj).exists()
+        return Favorites.objects.filter(user=user, recipes=obj).exists()
 
-    #def get_ingredients(self, obj):
-    # take care of getting list of the ingredients
+    def get_ingredients(self, obj):
+        return obj.ingredients.values(
+            'id',
+            'name',
+            'measurement_unit',
+            amount=F('recipes__ingredientrecipe__amount')
+        )
+
+class RecipeCreateSerializer(serializers.ModelSerializer):
+    ingredients = IngredientRecipeSerializer(many=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True
+    )
+    #image = Base64ImageField()
+    cooking_time = serializers.DurationField()
+
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'ingredients',
+            'tags',
+            'image',
+            'name',
+            'text',
+            'cooking_time',
+        )
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(author=request.user, **validated_data)
+        recipe.tags.set(tags)
+        # Need to end the way to handle adding ingredients to the instance.
+        # Seems that I got list of classes instead of dics of int and amount
+        for ingredient in ingredients:
+            IngredientRecipe.objects.get_or_create(
+                recipe=recipe, ingredient=ingredient.get('id') , amount=ingredient.get('amount')
+            )
+        return recipe
