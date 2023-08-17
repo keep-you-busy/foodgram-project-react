@@ -36,21 +36,34 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ('__all__')
-        read_only_fields = ("__all__",)
+        fields = '__all__'
+        read_only_fields = ('__all__',)
 
 class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = ('__all__')
-        read_only_fields = ("__all__",)
+        fields = '__all__'
+        read_only_fields = ('__all__',)
+
+class IngredientRecipeSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all(), many=True
+    )
+    amount = serializers.IntegerField()
+
+    class Meta:
+        model = IngredientRecipe
+        fields = (
+            'id',
+            'amount'
+        )
 
 class RecipeSerializer(serializers.ModelSerializer):
-    is_favorited = serializers.SerializerMethodField()
     tags = TagSerializer(many=True)
     author = CustomUserSerializer()
-    ingredients = IngredientSerializer(many=True)
+    ingredients = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField()
 
 
     class Meta:
