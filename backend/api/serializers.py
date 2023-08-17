@@ -1,5 +1,7 @@
+from core.extra_fields import Base64ImageField, Hex2NameColor
+from django.db.models import F
 from djoser.serializers import UserSerializer
-from recipes.models import Favorites, Ingredient, Recipe, Tag
+from recipes.models import Favorites, Ingredient, IngredientRecipe, Recipe, Tag
 from rest_framework import serializers
 from users.models import Follow, User
 
@@ -21,7 +23,7 @@ class CustomUserSerializer(UserSerializer):
             'is_subscribed',
             'password'
         )
-    read_only_fields = ("is_subscribed",)
+    read_only_fields = ('is_subscribed',)
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
