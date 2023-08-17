@@ -83,13 +83,12 @@ class Recipe(models.Model):
         verbose_name='Описание рецепта',
         null=False,
         blank=False,
-        default='Пустой текст'
     )
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe',
         verbose_name='Ингредиенты рецепта',
-        related_name='recipes'
+        related_name='recipes',
     )
     tags = models.ManyToManyField(
         Tag,
@@ -121,11 +120,11 @@ class IngredientRecipe(models.Model):
         on_delete=models.PROTECT
     )
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    quantity = models.DecimalField(
+    amount = models.DecimalField(
         verbose_name='Количество',
         max_digits=10,
         decimal_places=2,
-        default=0
+        default=1
 
     )
 
