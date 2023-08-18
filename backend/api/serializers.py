@@ -117,10 +117,32 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(author=request.user, **validated_data)
         recipe.tags.set(tags)
-        # Need to end the way to handle adding ingredients to the instance.
-        # Seems that I got list of classes instead of dics of int and amount
         for ingredient in ingredients:
             IngredientRecipe.objects.get_or_create(
-                recipe=recipe, ingredient=ingredient.get('id') , amount=ingredient.get('amount')
+                recipe=recipe,
+                ingredient=ingredient.get('id'),
+                amount=ingredient.get('amount')
             )
         return recipe
+
+    def update(self, instance, validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        instance.name = validated_data.get(
+            'name', instance.name
+        )
+        instance.text = validated_data.get(
+            'text', instance.text
+        )
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time
+        )
+        instance.tags.set(tags)
+        for ingredient in ingredients:
+            IngredientRecipe.objects.update_or_create(
+                recipe=instance,
+                ingredient=ingredient.get('id'),
+                amount=ingredient.get('amount')
+            )
+        instance.save()
+        return instance
