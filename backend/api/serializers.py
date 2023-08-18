@@ -137,6 +137,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.cooking_time = validated_data.get(
             'cooking_time', instance.cooking_time
         )
+        instance.tags.clear()
+        instance.ingredients.clear()
         instance.tags.set(tags)
         for ingredient in ingredients:
             IngredientRecipe.objects.update_or_create(
