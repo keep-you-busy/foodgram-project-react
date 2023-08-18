@@ -48,9 +48,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all(), many=True
+        queryset=Ingredient.objects.all()
     )
-    amount = serializers.IntegerField()
 
     class Meta:
         model = IngredientRecipe
@@ -99,9 +98,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
-    #image = Base64ImageField()
-    cooking_time = serializers.DurationField()
-
+    #image = Base64ImageField() - append after succesful test of other fields
 
     class Meta:
         model = Recipe
