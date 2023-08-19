@@ -148,3 +148,31 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
         instance.save()
         return instance
+
+
+class FavoritesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Favorites
+        fields = '__all__'
+
+class ResponseFavoritesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time'
+        )
+
+
+class FollowSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Follow
+        fields = (
+            'user',
+            'author'
+        )
