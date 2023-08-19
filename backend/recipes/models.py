@@ -158,9 +158,9 @@ class Favorites(models.Model):
         related_name='favorites',
         on_delete=models.CASCADE,
     )
-    recipes = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
-        verbose_name='Любимые рецепты',
+        verbose_name='Любимый рецепт',
         related_name='in_favorites',
         on_delete=models.CASCADE,
     )
@@ -170,9 +170,9 @@ class Favorites(models.Model):
         verbose_name_plural = 'Избранные'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipes'], name="unique_recipes_user"
+                fields=['user', 'recipe'], name="unique_recipe_user"
             )
         ]
 
     def __str__(self) -> str:
-        return f'{self.user.username}: {self.recipes.name}'
+        return f'{self.user.username}: {self.recipe.name}'
