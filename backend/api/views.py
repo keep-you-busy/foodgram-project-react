@@ -1,7 +1,10 @@
 from api.serializers import (CustomUserSerializer, FavoritesSerializer,
                              FollowSerializer, IngredientSerializer,
                              RecipeCreateSerializer, RecipeSerializer,
-                             ResponseFavoritesSerializer, TagSerializer)
+                             ResponseFavoritesSerializer,
+                             ResponsesubscribeSerializer, TagSerializer)
+from core.action_method import check_objects, save_delete_action, save_objects
+from core.exceptions import ObjectExistsError, ObjectNotFoundError
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from recipes.models import Favorites, Ingredient, Recipe, Tag
@@ -23,29 +26,22 @@ class CustomUserViewSet(UserViewSet):
             url_path='subscribe',
             url_name='subscribe'
     )
-    def subscribe(self, request, pk):
+    def subscribe(self, request, id):
         user = request.user
-        author = get_object_or_404(User, pk=pk)
+        author = get_object_or_404(User, pk=id)
         user_author = Follow.objects.filter(user=user, author=author)
-        if not user_author.exists():
-            return Response({
-                'errors': 'string',
-            }, status=status.HTTP_400_BAD_REQUEST
-            )
-        elif request.method == 'POST':
-            serializer = FollowSerializer(data={
-                'user': user.id,
-                'author': author.id
-            })
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            serializer = CustomUserSerializer(user)
-            import pdb;pdb.set_trace()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            user_author.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
+        data_to_response = {
+            'user': user.id,
+            'author': author.id
+        }
+        return save_delete_action(
+            request=request,
+            objects=user_author,
+            target=author,
+            serializer_class=FollowSerializer,
+            response_serializer_class=ResponsesubscribeSerializer,
+            data=data_to_response
+        )
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
@@ -85,22 +81,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         user_recipe = Favorites.objects.filter(user=user, recipe=recipe)
-        if not user_recipe.exists():
-            return Response({
-                'errors': 'string',
-            }, status=status.HTTP_400_BAD_REQUEST
-            )
-        elif request.method == 'POST':
-            serializer = FavoritesSerializer(data={
-                'user': user.id,
-                'recipe': recipe.id
-            })
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            serializer = ResponseFavoritesSerializer(recipe)
-            #import pdb;pdb.set_trace()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            user_recipe.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
+        data_to_response = {
+            'user': user.id,
+            'recipe': recipe.id
+        }
+        return save_delete_action(
+            request=request,
+            objects=user_recipe,
+            target=recipe,
+            serializer_class=FavoritesSerializer,
+            response_serializer_class=ResponseFavoritesSerializer,
+            data=data_to_response
+        )
