@@ -2,7 +2,7 @@ from rest_framework.exceptions import ValidationError
 
 
 def check_username(value=None, username=None):
-    """Декоратор валидирует значение поля username."""
+    """Валидирует значение поля username."""
     username = ['me'] if (username is None) else username
     username = [username.lower() for username in username]
 
