@@ -156,6 +156,30 @@ class FavoritesSerializer(serializers.ModelSerializer):
         model = Favorites
         fields = '__all__'
 
+class ResponsesubscribeSerializer(CustomUserSerializer):
+    recipes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes'
+        )
+
+    def get_recipes(self, obj):
+        return obj.recipes.values(
+            'id',
+            'name',
+            'image',
+            'cooking_time'
+        )
+
+
 class ResponseFavoritesSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -168,6 +192,7 @@ class ResponseFavoritesSerializer(serializers.ModelSerializer):
         )
 
 
+
 class FollowSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -176,3 +201,6 @@ class FollowSerializer(serializers.ModelSerializer):
             'user',
             'author'
         )
+
+    # need to write validate func to check
+    # to not subscrube to myself
