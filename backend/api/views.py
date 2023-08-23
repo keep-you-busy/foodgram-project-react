@@ -1,13 +1,17 @@
-from api.serializers import (CustomUserSerializer, FavoritesSerializer,
-                             FollowSerializer, IngredientSerializer,
-                             RecipeCreateSerializer, RecipeSerializer,
-                             ResponseFavoritesSerializer,
-                             ResponsesubscribeSerializer, TagSerializer)
-from core.action_method import check_objects, save_delete_action, save_objects
-from core.exceptions import ObjectExistsError, ObjectNotFoundError
+import tempfile
+
+from api.serializers import (CartSerializer, CustomUserSerializer,
+                             FavoriteSerializer, FollowSerializer,
+                             IngredientSerializer, RecipeCreateSerializer,
+                             RecipeSerializer, ResponseFavoriteSerializer,
+                             ResponseSubscribeSerializer, TagSerializer)
+from core.action_method import save_delete_action
+from core.creation_pdf import make_shopping_cart
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.http import urlquote
 from djoser.views import UserViewSet
-from recipes.models import Favorites, Ingredient, Recipe, Tag
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
