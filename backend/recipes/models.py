@@ -149,7 +149,7 @@ class TagRecipe(models.Model):
         return f'{self.tag}: {self.recipe}'
 
 
-class Favorites(models.Model):
+class Favorite(models.Model):
     """Модель избранных рецептов."""
 
     user = models.ForeignKey(
@@ -170,7 +170,35 @@ class Favorites(models.Model):
         verbose_name_plural = 'Избранные'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'], name="unique_recipe_user"
+                fields=['user', 'recipe'], name="unique_favorites"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f'{self.user.username}: {self.recipe.name}'
+
+class Cart(models.Model):
+    """Модель списка покупок."""
+
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        related_name='carts',
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name='Рецепт',
+        related_name='in_carts',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'], name="unique_cart"
             )
         ]
 
