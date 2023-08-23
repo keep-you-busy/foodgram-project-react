@@ -11,3 +11,6 @@ python-dotenv
 psycopg2-binary==2.9.3
 djoser==2.1.0
 PyYAML==6.0
+webcolors==1.13
+django-debug-toolbar==4.2.0
+fpdf==1.7.2
