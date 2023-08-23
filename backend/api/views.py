@@ -97,7 +97,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        user_recipe = Favorites.objects.filter(user=user, recipe=recipe)
+        user_recipe = Favorite.objects.filter(user=user, recipe=recipe)
         data_to_response = {
             'user': user.id,
             'recipe': recipe.id
@@ -106,7 +106,52 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request=request,
             objects=user_recipe,
             target=recipe,
-            serializer_class=FavoritesSerializer,
-            response_serializer_class=ResponseFavoritesSerializer,
+            serializer_class=FavoriteSerializer,
+            response_serializer_class=ResponseFavoriteSerializer,
             data=data_to_response
         )
+
+    @action(
+        methods=['POST', 'DELETE'],
+        detail=True,
+        permission_classes=(permissions.IsAuthenticated,),
+        url_path='shopping_cart',
+        url_name='shopping_cart'
+    )
+    def shopping_cart(self, request, pk):
+        user = request.user
+        recipe = get_object_or_404(Recipe, pk=pk)
+        user_recipe = Cart.objects.filter(user=user, recipe=recipe)
+        data_to_response = {
+            'user': user.id,
+            'recipe': recipe.id
+        }
+        return save_delete_action(
+            request=request,
+            objects=user_recipe,
+            target=recipe,
+            serializer_class=CartSerializer,
+            response_serializer_class=ResponseFavoriteSerializer,
+            data=data_to_response
+        )
+
+    @action(
+        methods=['GET'],
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,),
+        url_path='download_shopping_cart',
+        url_name='download_shopping_cart'
+    )
+    def download_shopping_cart(self, request):
+        with tempfile.NamedTemporaryFile(delete=False) as temp_pdf_file:
+            temp_filename = temp_pdf_file.name
+
+        make_shopping_cart(request.user, temp_filename)
+
+        with open(temp_filename, 'rb') as pdf_file:
+            pdf_content = pdf_file.read()
+
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        filename = urlquote(f"shopping_list_{request.user}.pdf")
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response
