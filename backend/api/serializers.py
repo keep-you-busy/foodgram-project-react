@@ -1,7 +1,8 @@
 from core.extra_fields import Base64ImageField, Hex2NameColor
 from django.db.models import F
 from djoser.serializers import UserSerializer
-from recipes.models import Favorites, Ingredient, IngredientRecipe, Recipe, Tag
+from recipes.models import (Cart, Favorite, Ingredient, IngredientRecipe,
+                            Recipe, Tag)
 from rest_framework import serializers
 from users.models import Follow, User
 
@@ -63,6 +64,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer()
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
 
     class Meta:
@@ -73,6 +75,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'author',
             'ingredients',
             'is_favorited',
+            'is_in_shopping_cart',
             'name',
             'image',
             'text',
@@ -83,7 +86,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Favorites.objects.filter(user=user, recipes=obj).exists()
+        return Favorite.objects.filter(user=user, recipe=obj).exists()
+
+    def get_is_in_shopping_cart(self, obj):
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return Cart.objects.filter(user=user, recipe=obj).exists()
 
     def get_ingredients(self, obj):
         return obj.ingredients.values(
