@@ -43,9 +43,22 @@ class CustomUserViewSet(UserViewSet):
             objects=user_author,
             target=author,
             serializer_class=FollowSerializer,
-            response_serializer_class=ResponsesubscribeSerializer,
+            response_serializer_class=ResponseSubscribeSerializer,
             data=data_to_response
         )
+
+    @action(
+        methods=['GET'],
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,),
+        url_path='subscriptions',
+        url_name='subscriptions'
+    )
+    def subscriptions(self, request):
+        queryset = User.objects.filter(following__author=request.user)
+        serializer = ResponseSubscribeSerializer(many=True, data=queryset)
+        serializer.is_valid()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
