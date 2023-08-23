@@ -158,14 +158,31 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-
-class FavoritesSerializer(serializers.ModelSerializer):
+class FollowSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Favorites
+        model = Follow
+        fields = (
+            'user',
+            'author'
+        )
+
+    # need to write validate func to check
+    # to not subscrube to myself
+
+class CartSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Cart
         fields = '__all__'
 
-class ResponsesubscribeSerializer(CustomUserSerializer):
+class FavoriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Favorite
+        fields = '__all__'
+
+class ResponseSubscribeSerializer(CustomUserSerializer):
     recipes = serializers.SerializerMethodField()
 
     class Meta:
@@ -189,7 +206,7 @@ class ResponsesubscribeSerializer(CustomUserSerializer):
         )
 
 
-class ResponseFavoritesSerializer(serializers.ModelSerializer):
+class ResponseFavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
@@ -199,17 +216,3 @@ class ResponseFavoritesSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time'
         )
-
-
-
-class FollowSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Follow
-        fields = (
-            'user',
-            'author'
-        )
-
-    # need to write validate func to check
-    # to not subscrube to myself
