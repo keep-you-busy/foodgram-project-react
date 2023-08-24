@@ -184,6 +184,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 class ResponseSubscribeSerializer(CustomUserSerializer):
     recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -194,8 +195,23 @@ class ResponseSubscribeSerializer(CustomUserSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-            'recipes'
+            'recipes',
+            'recipes_count'
+
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        recipes_limit = self.context.get('recipes_limit')
+        if recipes_limit is not None:
+            recipes_limit = int(recipes_limit)
+            data['recipes'] = data['recipes'][:recipes_limit]
+            data['recipes_count'] = min(recipes_limit, data['recipes_count'])
+
+        return data
+    
+
 
     def get_recipes(self, obj):
         return obj.recipes.values(
@@ -204,6 +220,9 @@ class ResponseSubscribeSerializer(CustomUserSerializer):
             'image',
             'cooking_time'
         )
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
 
 
 class ResponseFavoriteSerializer(serializers.ModelSerializer):
