@@ -25,7 +25,7 @@ def save_objects(request, target,
     )
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
+# need to fix thing with data, it's not important to have it here
 def save_delete_action(request, objects, target,
                        serializer_class, response_serializer_class, data):
     """Главный метод в декораторе action."""
