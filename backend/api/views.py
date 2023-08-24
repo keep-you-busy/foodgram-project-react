@@ -1,5 +1,6 @@
 import tempfile
 
+from api.filters import IngredientFilter, RecipeFilter
 from api.serializers import (CartSerializer, CustomUserSerializer,
                              FavoriteSerializer, FollowSerializer,
                              IngredientSerializer, RecipeCreateSerializer,
@@ -10,12 +11,12 @@ from core.creation_pdf import make_shopping_cart
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
+from django_filters import rest_framework as filters
 from djoser.views import UserViewSet
 from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
-from rest_framework.response import Response
 from users.models import Follow, User
 
 
@@ -55,10 +56,15 @@ class CustomUserViewSet(UserViewSet):
         url_name='subscriptions'
     )
     def subscriptions(self, request):
-        queryset = User.objects.filter(following__author=request.user)
-        serializer = ResponseSubscribeSerializer(many=True, data=queryset)
+        queryset = User.objects.filter(following__user=request.user)
+        data = self.paginate_queryset(queryset=queryset)
+        recipes_limit = request.query_params.get(self.paginator.recipes_limit_query_param)
+        serializer = ResponseSubscribeSerializer(
+            many=True,
+            data=data,
+            context={'request': request, 'recipes_limit': recipes_limit})
         serializer.is_valid()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return self.get_paginated_response(serializer.data)
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
@@ -69,9 +75,13 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = IngredientFilter
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
