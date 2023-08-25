@@ -96,11 +96,11 @@ class Recipe(models.Model):
         verbose_name='Теги рецепта',
         related_name='recipes'
     )
-    cooking_time = models.DurationField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время готовки рецепта',
         null=False,
         blank=False,
-        default=0
+        default=1,
     )
 
     class Meta:
@@ -120,10 +120,10 @@ class IngredientRecipe(models.Model):
         on_delete=models.PROTECT
     )
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    amount = models.DecimalField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
-        max_digits=10,
-        decimal_places=2,
+        null=False,
+        blank=False,
         default=1
 
     )
