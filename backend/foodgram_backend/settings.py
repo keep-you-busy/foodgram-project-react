@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
     'core.apps.CoreConfig',
     'debug_toolbar',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -129,6 +130,7 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
+CSV_FILES_DIR = BASE_DIR / '/data/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
