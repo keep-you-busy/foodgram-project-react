@@ -167,8 +167,12 @@ class FollowSerializer(serializers.ModelSerializer):
             'author'
         )
 
-    # need to write validate func to check
-    # to not subscrube to myself
+    def validate(self, attrs):
+        user = attrs.get('user')
+        author = attrs.get('author')
+        if user == author:
+            raise serializers.ValidationError({'errors': 'string'})
+        return attrs
 
 class CartSerializer(serializers.ModelSerializer):
 
@@ -210,8 +214,6 @@ class ResponseSubscribeSerializer(CustomUserSerializer):
             data['recipes_count'] = min(recipes_limit, data['recipes_count'])
 
         return data
-    
-
 
     def get_recipes(self, obj):
         return obj.recipes.values(
