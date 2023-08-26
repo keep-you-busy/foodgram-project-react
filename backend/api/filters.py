@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django_filters import rest_framework as filters
 from recipes.models import Ingredient, Recipe
 
@@ -33,10 +34,17 @@ class RecipeFilter(filters.FilterSet):
 
 
 class IngredientFilter(filters.FilterSet):
-    name = filters.CharFilter()
+    name = filters.CharFilter(method='filter_name')
 
     class Meta:
         model = Ingredient
         fields = (
             'name',
         )
+
+    def filter_name(self, queryset, name, value):
+        starts_with_queryset = queryset.filter(name__startswith=value)
+        contains_queryset = queryset.filter(name__contains=value)
+
+        sorted_queryset = starts_with_queryset.union(contains_queryset)
+        return sorted_queryset
