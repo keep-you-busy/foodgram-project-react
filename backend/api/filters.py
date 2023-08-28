@@ -1,9 +1,10 @@
-from django.db.models import Q
 from django_filters import rest_framework as filters
 from recipes.models import Ingredient, Recipe
 
 
 class RecipeFilter(filters.FilterSet):
+    """Фильтр для модели рецепта."""
+
     is_favorited = filters.BooleanFilter(
         method='get_filter_is_favorited'
     )
@@ -34,6 +35,12 @@ class RecipeFilter(filters.FilterSet):
 
 
 class IngredientFilter(filters.FilterSet):
+    """Фильтр для модели Ингредиента.
+
+    Даёт возможность фильра ингредиента по началу вхождения
+    и в произвольном месте.
+    """
+
     name = filters.CharFilter(method='filter_name')
 
     class Meta:

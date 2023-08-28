@@ -1,6 +1,8 @@
+"""Импорт temfile."""
 import tempfile
 
 from api.filters import IngredientFilter, RecipeFilter
+from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (CartSerializer, CustomUserSerializer,
                              FavoriteSerializer, FollowSerializer,
                              IngredientSerializer, RecipeCreateSerializer,
@@ -12,6 +14,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
 from django_filters import rest_framework as filters
+from djoser.conf import settings
 from djoser.views import UserViewSet
 from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from rest_framework import permissions, viewsets
@@ -21,8 +24,20 @@ from users.models import Follow, User
 
 
 class CustomUserViewSet(UserViewSet):
+    """Взаимодействие с пользователями.
+
+    Viewset позволяет создавать, изменять пользователя.
+    Доступны методы подписки и вывода текущих подписок.
+    """
+
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
+
+    def get_permissions(self):
+        """Выдаёт разрешение на вывод данных рецепта по ключу."""
+        if self.action == "retrieve":
+            self.permission_classes = settings.PERMISSIONS.user_list
+        return super().get_permissions()
 
     @action(
             methods=['POST', 'DELETE'],
@@ -32,6 +47,7 @@ class CustomUserViewSet(UserViewSet):
             url_name='subscribe'
     )
     def subscribe(self, request, id):
+        """Метод подписки пользователя на автора."""
         user = request.user
         author = get_object_or_404(User, pk=id)
         user_author = Follow.objects.filter(user=user, author=author)
@@ -56,9 +72,12 @@ class CustomUserViewSet(UserViewSet):
         url_name='subscriptions'
     )
     def subscriptions(self, request):
+        """Метод вывода текущих подписок пользователя."""
         queryset = User.objects.filter(following__user=request.user)
         data = self.paginate_queryset(queryset=queryset)
-        recipes_limit = request.query_params.get(self.paginator.recipes_limit_query_param)
+        recipes_limit = request.query_params.get(
+            self.paginator.recipes_limit_query_param
+            )
         serializer = ResponseSubscribeSerializer(
             many=True,
             data=data,
@@ -66,27 +85,64 @@ class CustomUserViewSet(UserViewSet):
         serializer.is_valid()
         return self.get_paginated_response(serializer.data)
 
+
 class TagViewSet(viewsets.ModelViewSet):
+    """Взаимодействие с тегами.
+
+    Viewset позволяет выводить список тегов.
+    Доступна возможность просмотра тега по ключу.
+    """
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
 
+
 class IngredientViewSet(viewsets.ModelViewSet):
+    """Взаимодействие с ингредиентами.
+
+    Viewset позволяет выводить список ингредиентов.
+    Доступна возможность просмотра ингредиента по ключу,
+    поиска ингредиента по входному значению.
+    """
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = IngredientFilter
 
+
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Взаимодействие с рецептами.
+
+    Viewset позволяет выводить список рецептов.
+    Доступна возможность просмотра рецепта по ключу.
+    Для авторизированных доступная возможность добавить
+    рецепт в избранное, добавить рецепт в список покупок,
+    скачать имеющийся список покупок.
+    """
+
     queryset = Recipe.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
+    def get_permissions(self):
+        """Выдаёт разрешение на редактирование рецепта."""
+        method = self.request.method
+        if method == 'PATCH':
+            self.permission_classes = (IsOwnerOrReadOnly,)
+        return super().get_permissions()
+
     def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS:
+        """Определяет сериалайзер на основании метода запроса."""
+        method = self.request.method
+        if method in SAFE_METHODS:
             self.serializer_class = RecipeSerializer
-        else:
+        elif method == 'POST':
+            self.serializer_class = RecipeCreateSerializer
+            self.pagination_class = None
+        elif method == 'PATCH':
             self.serializer_class = RecipeCreateSerializer
             self.pagination_class = None
         assert self.serializer_class is not None, (
@@ -105,6 +161,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             url_name='favorite'
     )
     def favorite(self, request, pk):
+        """Метод для добавления рецепта в избранное."""
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         user_recipe = Favorite.objects.filter(user=user, recipe=recipe)
@@ -129,6 +186,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_name='shopping_cart'
     )
     def shopping_cart(self, request, pk):
+        """Метод для добавления рецепта в список покупок."""
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         user_recipe = Cart.objects.filter(user=user, recipe=recipe)
@@ -153,6 +211,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_name='download_shopping_cart'
     )
     def download_shopping_cart(self, request):
+        """Метод для загрузки списка покупок в PDF формате."""
         with tempfile.NamedTemporaryFile(delete=False) as temp_pdf_file:
             temp_filename = temp_pdf_file.name
 

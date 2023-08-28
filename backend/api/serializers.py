@@ -1,13 +1,22 @@
+from collections import OrderedDict
+
 from core.extra_fields import Base64ImageField, Hex2NameColor
 from django.db.models import F
 from djoser.serializers import UserSerializer
 from recipes.models import (Cart, Favorite, Ingredient, IngredientRecipe,
                             Recipe, Tag)
 from rest_framework import serializers
+from rest_framework.relations import Hyperlink, PKOnlyObject
 from users.models import Follow, User
 
 
 class CustomUserSerializer(UserSerializer):
+    """Сериализатор для модели Пользователей.
+
+    Дополнительно обрабатывает булевое значение подписки пользователя
+    на автора.
+    """
+
     is_subscribed = serializers.SerializerMethodField()
     password = serializers.CharField(
         write_only=True, style={'input_type': 'password'}
@@ -34,20 +43,26 @@ class CustomUserSerializer(UserSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Тегов."""
 
     class Meta:
         model = Tag
         fields = '__all__'
         read_only_fields = ('__all__',)
 
+
 class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Ингредиентов."""
 
     class Meta:
         model = Ingredient
         fields = '__all__'
         read_only_fields = ('__all__',)
 
+
 class IngredientRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Ингредиентов, связанной по первичному ключу."""
+
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all()
     )
@@ -59,7 +74,14 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
             'amount'
         )
 
+
 class RecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Рецептов.
+
+    Дополнительно обрабатывает булевое значение подписки пользователя
+    на автора.
+    """
+
     tags = TagSerializer(many=True)
     author = CustomUserSerializer()
     ingredients = serializers.SerializerMethodField()
@@ -102,12 +124,15 @@ class RecipeSerializer(serializers.ModelSerializer):
             amount=F('recipes__ingredientrecipe__amount')
         )
 
+
 class RecipeCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания или изменения в модели Рецепта."""
+
     ingredients = IngredientRecipeSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
-    #image = Base64ImageField() - append after succesful test of other fields
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
@@ -158,7 +183,15 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    def to_representation(self, instance):
+        context = self.context.copy()
+        context['request'] = self.context.get('request')
+        recipe_serializer = RecipeSerializer(instance, context=context)
+        return recipe_serializer.data
+
+
 class FollowSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Подписок."""
 
     class Meta:
         model = Follow
@@ -171,22 +204,34 @@ class FollowSerializer(serializers.ModelSerializer):
         user = attrs.get('user')
         author = attrs.get('author')
         if user == author:
-            raise serializers.ValidationError({'errors': 'string'})
+            raise serializers.ValidationError(
+                {'errors': 'Нельзя подписаться на себя самого!'}
+            )
         return attrs
 
 class CartSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Списка покупок."""
 
     class Meta:
         model = Cart
         fields = '__all__'
 
+
 class FavoriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Избранное."""
 
     class Meta:
         model = Favorite
         fields = '__all__'
 
+
 class ResponseSubscribeSerializer(CustomUserSerializer):
+    """Сериализатор для методов подписок.
+
+    Ограничивает выдачу рецептов по запросу,
+    выдаёт количество объектов рецепта в базе данных по подписке.
+    """
+
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
@@ -228,6 +273,7 @@ class ResponseSubscribeSerializer(CustomUserSerializer):
 
 
 class ResponseFavoriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для методов избранного."""
 
     class Meta:
         model = Recipe

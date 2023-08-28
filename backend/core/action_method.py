@@ -2,16 +2,13 @@ from core.exceptions import ObjectExistsError, ObjectNotFoundError
 from rest_framework import status
 from rest_framework.response import Response
 
-# need to add constants for errors messages here
-ERROR = 'error'
-
 
 def check_objects(method, objects):
     """Метод для проверки соответствия метода и действия с объектами."""
     if not objects.exists() and method == 'DELETE':
-        raise ObjectExistsError(f'{ERROR}')
+        raise ObjectNotFoundError('Объект не найден.')
     elif objects.exists() and method == 'POST':
-        raise ObjectNotFoundError(f'{ERROR}')
+        raise ObjectExistsError('Объект уже существует.')
 
 
 def save_objects(request, target, 
@@ -25,7 +22,7 @@ def save_objects(request, target,
     )
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-# need to fix thing with data, it's not important to have it here
+
 def save_delete_action(request, objects, target,
                        serializer_class, response_serializer_class, data):
     """Главный метод в декораторе action."""

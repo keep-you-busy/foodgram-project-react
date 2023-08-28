@@ -4,6 +4,8 @@ from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag, TagRecipe
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
+    """Админ панель для модели Ингредиентов."""
+
     list_display = (
         'name',
         'measurement_unit',
@@ -13,16 +15,25 @@ class IngredientAdmin(admin.ModelAdmin):
     )
     empty_value_display = '-пусто-'
 
+
 class IngredientRecipeInline(admin.TabularInline):
+    """Форма для модели Ингредиентов, связзаной по первичному ключу."""
+
     model = IngredientRecipe
     extra = 1
 
+
 class TagRecipeInline(admin.TabularInline):
+    """Форма для модели Тега, связзаной по первичному ключу."""
+
     model = TagRecipe
     extra = 1
 
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
+    """Админ панель для модели Рецептов."""
+
     list_display = (
         'author',
         'name',

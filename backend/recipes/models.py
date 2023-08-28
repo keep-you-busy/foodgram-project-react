@@ -74,7 +74,8 @@ class Recipe(models.Model):
     name = models.CharField(
         verbose_name='Наименование рецепта',
         max_length=256,
-        blank=False
+        blank=False,
+        unique=True
     )
     image = models.ImageField(
         verbose_name='Изображение рецепта',
@@ -180,6 +181,7 @@ class Favorite(models.Model):
 
     def __str__(self) -> str:
         return f'{self.user.username}: {self.recipe.name}'
+
 
 class Cart(models.Model):
     """Модель списка покупок."""

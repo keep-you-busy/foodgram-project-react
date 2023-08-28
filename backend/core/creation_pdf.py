@@ -14,6 +14,8 @@ AMOUNT_WIDTH = 30
 
 
 class PDFWithHeaderFooter(FPDF):
+    """Класс с готовыми значениями загаловка и нижнего колонтитула."""
+
     def header(self):
         self.add_font('NotoSans', style='', fname=FONT_PATH, uni=True)
         self.set_font('NotoSans', size=12)
@@ -26,6 +28,7 @@ class PDFWithHeaderFooter(FPDF):
         self.cell(0, 10, 'Страница ' + str(self.page_no()), 0, 0, 'C')
 
 def data_prepare(user):
+    """Метод для забора и  подготовки данных для PDF."""
     ingredients_data = defaultdict(lambda: ('', 0))
     ingredients_values = IngredientRecipe.objects.filter(
         recipe__in_carts__user=user
@@ -44,6 +47,7 @@ def data_prepare(user):
 
 
 def make_shopping_cart(user, temp_filename):
+    """Создание списка покупок в PDF."""
     pdf = PDFWithHeaderFooter()
     font_path = os.path.join(SYSTEM_TTFONTS, 'NotoSans-Regular.ttf')
     pdf.add_font('NotoSans', style='', fname=font_path, uni=True)
