@@ -1,4 +1,3 @@
-"""Импорт temfile."""
 import tempfile
 
 from api.filters import IngredientFilter, RecipeFilter

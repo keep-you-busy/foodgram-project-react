@@ -2,7 +2,7 @@
 import os
 from collections import defaultdict
 
-from django.db.models import F, Sum
+from django.db.models import Sum
 from fpdf import FPDF
 from recipes.models import IngredientRecipe
 
@@ -26,6 +26,7 @@ class PDFWithHeaderFooter(FPDF):
         self.set_y(-15)
         self.set_font('NotoSans', size=8)
         self.cell(0, 10, 'Страница ' + str(self.page_no()), 0, 0, 'C')
+
 
 def data_prepare(user):
     """Метод для забора и  подготовки данных для PDF."""
