@@ -2,7 +2,6 @@ import csv
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db.utils import IntegrityError
 from recipes.models import Ingredient, Tag
 
 DATA_FOLDER = settings.BASE_DIR.parent / 'data'
@@ -33,10 +32,10 @@ class Command(BaseCommand):
         try:
             self.import_data_from_csv(
                 'ingredients.csv', Ingredient, ['name', 'measurement_unit']
-                )
+            )
             self.import_data_from_csv(
                 'tags.csv', Tag, ['name', 'color', 'slug']
-                )
+            )
         except Exception as error:
             self.stdout.write(self.style.ERROR(error))
             raise error

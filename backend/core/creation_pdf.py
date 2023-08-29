@@ -36,7 +36,7 @@ def data_prepare(user):
     ).values(
         'ingredient__name',
         'ingredient__measurement_unit'
-        ).annotate(amount=Sum('amount'))
+    ).annotate(amount=Sum('amount'))
     for item in ingredients_values:
         name = item.get('ingredient__name')
         unit = item.get('ingredient__measurement_unit')
