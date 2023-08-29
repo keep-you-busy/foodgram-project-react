@@ -45,13 +45,11 @@ class CustomUserViewSet(UserViewSet):
             self.permission_classes = settings.PERMISSIONS.user_list
         return super().get_permissions()
 
-    @action(
-            methods=['POST', 'DELETE'],
+    @action(methods=['POST', 'DELETE'],
             detail=True,
             permission_classes=(permissions.IsAuthenticated,),
             url_path='subscribe',
-            url_name='subscribe'
-    )
+            url_name='subscribe')
     def subscribe(self, request, id):
         """Метод подписки пользователя на автора."""
         user = request.user
@@ -67,23 +65,20 @@ class CustomUserViewSet(UserViewSet):
             target=author,
             serializer_class=FollowSerializer,
             response_serializer_class=ResponseSubscribeSerializer,
-            data=data_to_response
-        )
+            data=data_to_response)
 
-    @action(
-        methods=['GET'],
-        detail=False,
-        permission_classes=(permissions.IsAuthenticated,),
-        url_path='subscriptions',
-        url_name='subscriptions'
-    )
+    @action(methods=['GET'],
+            detail=False,
+            permission_classes=(permissions.IsAuthenticated,),
+            url_path='subscriptions',
+            url_name='subscriptions')
     def subscriptions(self, request):
         """Метод вывода текущих подписок пользователя."""
         queryset = User.objects.filter(following__user=request.user)
         data = self.paginate_queryset(queryset=queryset)
         recipes_limit = request.query_params.get(
             self.paginator.recipes_limit_query_param
-            )
+        )
         serializer = ResponseSubscribeSerializer(
             many=True,
             data=data,
@@ -159,13 +154,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return self.serializer_class
 
-    @action(
-            methods=['POST', 'DELETE'],
+    @action(methods=['POST', 'DELETE'],
             detail=True,
             permission_classes=(permissions.IsAuthenticated,),
             url_path='favorite',
-            url_name='favorite'
-    )
+            url_name='favorite')
     def favorite(self, request, pk):
         """Метод для добавления рецепта в избранное."""
         user = request.user
@@ -181,16 +174,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             target=recipe,
             serializer_class=FavoriteSerializer,
             response_serializer_class=ResponseFavoriteSerializer,
-            data=data_to_response
-        )
+            data=data_to_response)
 
-    @action(
-        methods=['POST', 'DELETE'],
-        detail=True,
-        permission_classes=(permissions.IsAuthenticated,),
-        url_path='shopping_cart',
-        url_name='shopping_cart'
-    )
+    @action(methods=['POST', 'DELETE'],
+            detail=True,
+            permission_classes=(permissions.IsAuthenticated,),
+            url_path='shopping_cart',
+            url_name='shopping_cart')
     def shopping_cart(self, request, pk):
         """Метод для добавления рецепта в список покупок."""
         user = request.user
@@ -206,16 +196,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             target=recipe,
             serializer_class=CartSerializer,
             response_serializer_class=ResponseFavoriteSerializer,
-            data=data_to_response
-        )
+            data=data_to_response)
 
-    @action(
-        methods=['GET'],
-        detail=False,
-        permission_classes=(permissions.IsAuthenticated,),
-        url_path='download_shopping_cart',
-        url_name='download_shopping_cart'
-    )
+    @action(methods=['GET'],
+            detail=False,
+            permission_classes=(permissions.IsAuthenticated,),
+            url_path='download_shopping_cart',
+            url_name='download_shopping_cart')
     def download_shopping_cart(self, request):
         """Метод для загрузки списка покупок в PDF формате."""
         with tempfile.NamedTemporaryFile(delete=False) as temp_pdf_file:

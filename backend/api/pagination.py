@@ -9,6 +9,5 @@ class CustomPagination(PageNumberPagination):
 
     def paginate_queryset(self, queryset, request, view=None):
         self.recipes_limit = request.query_params.get(
-            self.recipes_limit_query_param
-            )
+            self.recipes_limit_query_param)
         return super().paginate_queryset(queryset, request, view)
