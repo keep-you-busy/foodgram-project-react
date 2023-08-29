@@ -11,7 +11,7 @@ def check_objects(method, objects):
         raise ObjectExistsError('Объект уже существует.')
 
 
-def save_objects(request, target, 
+def save_objects(request, target,
                  serializer_class, response_serializer_class, data):
     """Метод для сохранения отношений субъекта и объекта."""
     serializer = serializer_class(data=data)

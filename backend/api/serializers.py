@@ -85,7 +85,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
-
     class Meta:
         model = Recipe
         fields = (
@@ -205,6 +204,7 @@ class FollowSerializer(serializers.ModelSerializer):
                 {'errors': 'Нельзя подписаться на себя самого!'}
             )
         return attrs
+
 
 class CartSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Списка покупок."""

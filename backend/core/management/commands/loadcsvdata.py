@@ -7,54 +7,36 @@ from recipes.models import Ingredient, Tag
 
 DATA_FOLDER = settings.BASE_DIR.parent / 'data'
 
+
 class Command(BaseCommand):
     help = 'Import ingredients and tags from csv data.'
     requires_migrations_checks = True
 
     @staticmethod
-    def import_ingredients_from_csv(file_name, model):
-        """Импортирует ингредиенты из CSV в базу данных для указанной модели."""
+    def import_data_from_csv(file_name, model, obj_keys):
+        """Импортирует данные из CSV в базу данных для указанной модели."""
         with open(DATA_FOLDER / file_name, "rt") as file:
             file.readline()
             objects = []
             names = set()
             for row in csv.reader(file, dialect="excel"):
-                name, measurement_unit = row
-                if name in names:
+                name = row[0]
+                if row[0] in names:
                     continue
                 names.add(name)
-                obj_kwargs = {
-                    'name': name,
-                    'measurement_unit': measurement_unit
-                }
-                objects.append(model(**obj_kwargs))
-            model.objects.bulk_create(objects)
-
-    @staticmethod
-    def import_tags_from_csv(file_name, model):
-        """Импортирует ингредиенты из CSV в базу данных для указанной модели."""
-        with open(DATA_FOLDER / file_name, "rt") as file:
-            file.readline()
-            objects = []
-            names = set()
-            for row in csv.reader(file, dialect="excel"):
-                name, color, slug = row
-                if name in names:
-                    continue
-                names.add(name)
-                obj_kwargs = {
-                    'name': name,
-                    'color': color,
-                    'slug': slug
-                }
+                obj_kwargs = {k: v for k, v in zip(obj_keys, row)}
                 objects.append(model(**obj_kwargs))
             model.objects.bulk_create(objects)
 
     def handle(self, *args, **options):
         """Начинает импортировать и записывать данные в базу данных."""
         try:
-            self.import_ingredients_from_csv('ingredients.csv', Ingredient)
-            self.import_tags_from_csv('tags.csv', Tag)
+            self.import_data_from_csv(
+                'ingredients.csv', Ingredient, ['name', 'measurement_unit']
+                )
+            self.import_data_from_csv(
+                'tags.csv', Tag, ['name', 'color', 'slug']
+                )
         except Exception as error:
             self.stdout.write(self.style.ERROR(error))
             raise error

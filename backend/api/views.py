@@ -2,11 +2,18 @@ import tempfile
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.permissions import IsOwnerOrReadOnly
-from api.serializers import (CartSerializer, CustomUserSerializer,
-                             FavoriteSerializer, FollowSerializer,
-                             IngredientSerializer, RecipeCreateSerializer,
-                             RecipeSerializer, ResponseFavoriteSerializer,
-                             ResponseSubscribeSerializer, TagSerializer)
+from api.serializers import (
+    CartSerializer,
+    CustomUserSerializer,
+    FavoriteSerializer,
+    FollowSerializer,
+    IngredientSerializer,
+    RecipeCreateSerializer,
+    RecipeSerializer,
+    ResponseFavoriteSerializer,
+    ResponseSubscribeSerializer,
+    TagSerializer
+)
 from core.action_method import save_delete_action
 from core.creation_pdf import make_shopping_cart
 from django.http import HttpResponse
