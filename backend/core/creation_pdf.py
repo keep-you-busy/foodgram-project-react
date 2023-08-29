@@ -33,7 +33,7 @@ def data_prepare(user):
     ingredients_data = defaultdict(lambda: ('', 0))
     ingredients_values = IngredientRecipe.objects.filter(
         recipe__in_carts__user=user
-        ).values(
+    ).values(
         'ingredient__name',
         'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount'))
