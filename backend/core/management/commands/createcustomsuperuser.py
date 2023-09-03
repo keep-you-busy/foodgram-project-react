@@ -1,7 +1,8 @@
-import os
+import os as operating_system
 
 from django.core.management.base import BaseCommand
 from dotenv import load_dotenv
+
 from users.models import User
 
 load_dotenv()
@@ -15,15 +16,24 @@ class Command(BaseCommand):
     def create_custom_superuser(user_model):
         if not user_model.objects.filter(username='admin').exists():
             user_model.objects.create_superuser(
-                email=os.getenv('SUPERUSER_EMAIL', 'admin@admin.com'),
-                username=os.getenv('SUPERUSER_USERNAME', 'admin'),
-                first_name=os.getenv('SUPERUSER_FIRST_NAME', 'admin'),
-                last_name=os.getenv('SUPERUSER_LAST_NAME', 'admin'),
-                password=os.getenv('SUPERUSER_PASSWORD', 'admin')
+                email=operating_system.getenv(
+                    'SUPERUSER_EMAIL', 'admin@admin.com'
+                ),
+                username=operating_system.getenv(
+                    'SUPERUSER_USERNAME', 'admin'
+                ),
+                first_name=operating_system.getenv(
+                    'SUPERUSER_FIRST_NAME', 'admin'
+                ),
+                last_name=operating_system.getenv(
+                    'SUPERUSER_LAST_NAME', 'admin'
+                ),
+                password=operating_system.getenv(
+                    'SUPERUSER_PASSWORD', 'admin'
+                )
             )
             return True
-        else:
-            return False
+        return False
 
     def handle(self, *args, **options):
         if self.create_custom_superuser(User):
