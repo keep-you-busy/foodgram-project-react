@@ -16,16 +16,14 @@ class Command(BaseCommand):
         """Импортирует данные из CSV в базу данных для указанной модели."""
         with open(DATA_FOLDER / file_name, "rt") as file:
             file.readline()
-            objects = []
             names = set()
             for row in csv.reader(file, dialect="excel"):
-                name = row[0]
-                if row[0] in names:
+                name = next(iter(row))
+                if name in names:
                     continue
                 names.add(name)
-                obj_kwargs = {k: v for k, v in zip(obj_keys, row)}
-                objects.append(model(**obj_kwargs))
-            model.objects.bulk_create(objects)
+                obj_kwargs = {key: value for key, value in zip(obj_keys, row)}
+                model.objects.get_or_create(**obj_kwargs)
 
     def handle(self, *args, **options):
         """Начинает импортировать и записывать данные в базу данных."""
