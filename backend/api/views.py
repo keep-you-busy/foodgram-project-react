@@ -1,31 +1,25 @@
 import tempfile
 
-from api.filters import IngredientFilter, RecipeFilter
-from api.permissions import IsOwnerOrReadOnly
-from api.serializers import (
-    CartSerializer,
-    CustomUserSerializer,
-    FavoriteSerializer,
-    FollowSerializer,
-    IngredientSerializer,
-    RecipeCreateSerializer,
-    RecipeSerializer,
-    ResponseFavoriteSerializer,
-    ResponseSubscribeSerializer,
-    TagSerializer
-)
-from core.action_method import save_delete_action
-from core.creation_pdf import make_shopping_cart
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.http import urlquote
 from django_filters import rest_framework as filters
 from djoser.conf import settings
 from djoser.views import UserViewSet
-from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
+
+from api.filters import IngredientFilter, RecipeFilter
+from api.permissions import IsOwnerOrReadOnly
+from api.serializers import (CartSerializer, CustomUserSerializer,
+                             FavoriteSerializer, FollowSerializer,
+                             IngredientSerializer, RecipeCreateSerializer,
+                             RecipeSerializer, ResponseFavoriteSerializer,
+                             ResponseSubscribeSerializer, TagSerializer)
+from core.action_method import save_delete_action
+from core.creation_pdf import make_shopping_cart
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from users.models import Follow, User
 
 
@@ -146,12 +140,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         elif method == 'PATCH':
             self.serializer_class = RecipeCreateSerializer
             self.pagination_class = None
-        assert self.serializer_class is not None, (
-            "'%s' should either include a `serializer_class` attribute, "
-            "or override the `get_serializer_class()` method."
-            % self.__class__.__name__
-        )
-
         return self.serializer_class
 
     @action(methods=['POST', 'DELETE'],
