@@ -34,11 +34,9 @@ class CustomUserSerializer(UserSerializer):
         )
     read_only_fields = ('is_subscribed',)
 
+    @check_is_flagged(model=Follow, relation_parameter='author')
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=user, author=obj).exists()
+        pass
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -102,17 +100,13 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
+    @check_is_flagged(model=Favorite, relation_parameter='recipe')
     def get_is_favorited(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Favorite.objects.filter(user=user, recipe=obj).exists()
+        pass
 
+    @check_is_flagged(model=Cart, relation_parameter='recipe')
     def get_is_in_shopping_cart(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Cart.objects.filter(user=user, recipe=obj).exists()
+        pass
 
     def get_ingredients(self, obj):
         return obj.ingredients.values(
