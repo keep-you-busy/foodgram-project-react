@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'debug_toolbar',
     'django_filters',
+    'colorfield'
 ]
 
 MIDDLEWARE = [
@@ -164,3 +165,10 @@ DJOSER = {
     },
     'HIDE_USERS': False,
 }
+
+# Constants for the models
+NAME_MAX_LENGHT = 250
+RECIPE_NAME_MAX_LENGHT = 256
+USER_FIELD_MAX_LENGHT = 150
+EMAIL_FIELD_MAX_LENGHT = 254
+SHORT_FIELD_MAX_LENGHT = 50
