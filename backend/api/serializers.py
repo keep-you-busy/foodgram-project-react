@@ -1,9 +1,11 @@
-from core.extra_fields import Base64ImageField
 from django.db.models import F
 from djoser.serializers import UserSerializer
+from rest_framework import serializers
+
+from api.utils import check_is_flagged
+from core.extra_fields import Base64ImageField
 from recipes.models import (Cart, Favorite, Ingredient, IngredientRecipe,
                             Recipe, Tag)
-from rest_framework import serializers
 from users.models import Follow, User
 
 
