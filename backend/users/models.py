@@ -1,7 +1,12 @@
-from core.user_validation import check_username
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.db import models
+
+from core.user_validation import check_username
+
+
+USER_HELP_TEXT_TEMPLATE = 'Обязательно для заполнения, не более {} символов.'
 
 
 class User(AbstractUser):
@@ -11,7 +16,9 @@ class User(AbstractUser):
 
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
-        help_text=('Обязательно для заполнения, не более 254 символа.'),
+        help_text=(
+            USER_HELP_TEXT_TEMPLATE.format(settings.EMAIL_FIELD_MAX_LENGHT)
+        ),
         unique=True,
         blank=False,
         null=False
@@ -19,28 +26,36 @@ class User(AbstractUser):
     )
     username = models.CharField(
         verbose_name='Уникальный юзернейм',
-        help_text=('Обазятельно для заполнения, не более 150 символов.'),
-        max_length=150,
+        help_text=(
+            USER_HELP_TEXT_TEMPLATE.format(settings.USER_FIELD_MAX_LENGHT)
+        ),
+        max_length=settings.USER_FIELD_MAX_LENGHT,
         unique=True,
         validators=[username_validator],
         blank=False,
     )
     first_name = models.CharField(
         verbose_name='Имя',
-        help_text=('Обазятельно для заполнения, не более 150 символов.'),
-        max_length=150,
+        help_text=(
+            USER_HELP_TEXT_TEMPLATE.format(settings.USER_FIELD_MAX_LENGHT)
+        ),
+        max_length=settings.USER_FIELD_MAX_LENGHT,
         blank=False,
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
-        help_text=('Обазятельно для заполнения, не более 150 символов.'),
-        max_length=150,
+        help_text=(
+            USER_HELP_TEXT_TEMPLATE.format(settings.USER_FIELD_MAX_LENGHT)
+        ),
+        max_length=settings.USER_FIELD_MAX_LENGHT,
         blank=False,
     )
     password = models.CharField(
         verbose_name='Пароль',
-        help_text=('Обазятельно для заполнения, не более 150 символов.'),
-        max_length=150,
+        help_text=(
+            USER_HELP_TEXT_TEMPLATE.format(settings.USER_FIELD_MAX_LENGHT)
+        ),
+        max_length=settings.USER_FIELD_MAX_LENGHT,
         blank=False,
     )
 
