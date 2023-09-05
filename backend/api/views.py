@@ -200,8 +200,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         with open(temp_filename, 'rb') as pdf_file:
             pdf_content = pdf_file.read()
-
         response = HttpResponse(pdf_content, content_type='application/pdf')
-        filename = urlquote(f"shopping_list_{request.user}.pdf")
+        filename = urlquote(f'shopping_list_{request.user}.pdf')
         response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
