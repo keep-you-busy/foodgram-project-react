@@ -3,8 +3,7 @@ import csv
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from recipes.models import Ingredient, Tag
-
-DATA_FOLDER = settings.BASE_DIR.parent / 'data'
+from pathlib import Path
 
 
 class Command(BaseCommand):
@@ -14,7 +13,7 @@ class Command(BaseCommand):
     @staticmethod
     def import_data_from_csv(file_name, model, obj_keys):
         """Импортирует данные из CSV в базу данных для указанной модели."""
-        with open(DATA_FOLDER / file_name, "rt") as file:
+        with open(Path(settings.CSV_FILES_DIR) / file_name, "rt") as file:
             file.readline()
             names = set()
             for row in csv.reader(file, dialect="excel"):
