@@ -131,7 +131,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media/'
+MEDIA_ROOT = '/app/media/'
 CSV_FILES_DIR = 'data'
 
 # Default primary key field type
