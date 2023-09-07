@@ -40,12 +40,16 @@ def data_prepare(user):
         'ingredient__name',
         'ingredient__measurement_unit'
     ).annotate(amount=Sum('amount'))
+
     for item in ingredients_values:
         name = item.get('ingredient__name')
         unit = item.get('ingredient__measurement_unit')
-        amount = str(item.get('amount'))
-
-        ingredients_data[name] = (unit, amount)
+        amount = item.get('amount')
+        current_unit, current_amount = ingredients_data[name]
+        if not current_unit:
+            current_unit = unit
+        current_amount += amount
+        ingredients_data[name] = (current_unit, current_amount)
 
     return ingredients_data
 
@@ -74,6 +78,7 @@ def make_shopping_cart(user, temp_filename):
     for name, (unit, amount) in ingredients_data.items():
         name = russian_to_latin(name)
         unit = russian_to_latin(unit)
+        amount = str(amount)
         pdf.cell(INGREDIENT_WIDTH, 10, name, border=1)
         pdf.cell(MEASUREMENT_WIDTH, 10, unit, border=1)
         pdf.cell(AMOUNT_WIDTH, 10, amount, border=1)
