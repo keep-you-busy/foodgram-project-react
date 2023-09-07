@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import F
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
@@ -109,11 +110,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         pass
 
     def get_ingredients(self, obj):
-        return obj.ingredients.values(
-            'id',
-            'name',
-            'measurement_unit',
-            amount=F('recipes__ingredientrecipe__amount')
+        return obj.ingredientrecipe_set.values(
+            'ingredient_id',
+            'amount',
+            name=F('ingredient__name'),
+            measurement_unit=F('ingredient__measurement_unit')
         )
 
 
@@ -230,7 +231,7 @@ class ResponseSubscribeSerializer(CustomUserSerializer):
 
     class Meta:
         model = User
-        fields = fields = (
+        fields = (
             'email',
             'id',
             'username',
