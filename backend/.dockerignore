@@ -1,0 +1,17 @@
+venv
+.git
+db.sqlite3
+.idea
+.vscode
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.pyc.*
+*.pyo.*
+logs
+*.log
+conf.d
+sites-available
+sites-enabled
+.env
