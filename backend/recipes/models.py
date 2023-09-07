@@ -29,6 +29,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ('name',)
 
     def __str__(self) -> str:
         return f'{self.name}'
@@ -56,6 +57,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ('name',)
         constraints = [
             models.UniqueConstraint(
                 fields=['name', 'measurement_unit'],
@@ -92,6 +94,11 @@ class Recipe(models.Model):
         blank=False,
         default=None
     )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации',
+        auto_now_add=True,
+        editable=False,
+    )
     text = models.TextField(
         verbose_name='Описание рецепта',
         null=False,
@@ -119,6 +126,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ("-pub_date",)
 
     def __str__(self) -> str:
         return f'{self.name}'
@@ -142,6 +150,9 @@ class IngredientRecipe(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Ингридиент'
+        verbose_name_plural = 'Количество ингридиентов'
+        ordering = ('recipe',)
         constraints = [
             models.UniqueConstraint(
                 fields=['ingredient', 'recipe'],
