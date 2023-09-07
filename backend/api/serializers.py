@@ -255,12 +255,20 @@ class ResponseSubscribeSerializer(CustomUserSerializer):
         return data
 
     def get_recipes(self, obj):
-        return obj.recipes.values(
+        request = self.context.get('request')
+        recipes = obj.recipes.values(
             'id',
             'name',
             'image',
             'cooking_time'
         )
+
+        for recipe in recipes:
+            if 'image' in recipe and recipe['image']:
+                image_url = request.build_absolute_uri(recipe['image'])
+                recipe['image'] = image_url.replace(
+                    request.path, settings.MEDIA_URL)
+        return recipes
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
