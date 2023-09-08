@@ -1,7 +1,7 @@
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticatedOrReadOnly
 
 
-class IsOwnerOrReadOnly(IsAuthenticatedOrReadOnly):
+class IsOwnerOrStaffOrReadOnly(IsAuthenticatedOrReadOnly):
     """Только владелец объекта может его редактировать."""
 
     def has_object_permission(self, request, view, obj):
