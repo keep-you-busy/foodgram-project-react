@@ -50,10 +50,6 @@ class Ingredient(models.Model):
         blank=False
     )
 
-    def save(self, *args, **kwargs):
-        self.name = self.name.lower()
-        super().save(*args, **kwargs)
-
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
@@ -184,24 +180,16 @@ class TagRecipe(models.Model):
 class BaseListModel(models.Model):
     """Базовая модель для привязки пользователя и рецепта."""
 
-    @staticmethod
-    def get_user_related_name():
-        return '%(class)ss'
-
-    @staticmethod
-    def get_recipe_related_name():
-        return 'in_%(class)ss'
-
     user = models.ForeignKey(
         User,
         verbose_name='Пользователь',
-        related_name=get_user_related_name.__func__(),
+        related_name='%(class)ss',
         on_delete=models.CASCADE,
     )
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
-        related_name=get_recipe_related_name.__func__(),
+        related_name='in_%(class)ss',
         on_delete=models.CASCADE,
     )
 
