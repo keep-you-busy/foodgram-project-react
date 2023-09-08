@@ -11,7 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
 
 from api.filters import IngredientFilter, RecipeFilter
-from api.permissions import IsOwnerOrReadOnly
+from api.permissions import IsOwnerOrStaffOrReadOnly
 from api.serializers import (CartSerializer, CustomUserSerializer,
                              FavoriteSerializer, FollowSerializer,
                              IngredientSerializer, RecipeCreateSerializer,
@@ -126,7 +126,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Выдаёт разрешение на редактирование рецепта."""
         method = self.request.method
         if method == 'PATCH':
-            self.permission_classes = (IsOwnerOrReadOnly,)
+            self.permission_classes = (IsOwnerOrStaffOrReadOnly,)
         return super().get_permissions()
 
     def get_serializer_class(self):
