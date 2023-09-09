@@ -30,6 +30,7 @@ class TagRecipeInline(admin.TabularInline):
 
     model = TagRecipe
     extra = 1
+    min_mum = 1
 
 
 @admin.register(Recipe)
