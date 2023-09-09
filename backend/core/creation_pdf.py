@@ -54,8 +54,7 @@ def data_prepare(user):
 def make_shopping_cart(user, temp_filename):
     """Создание списка покупок в PDF."""
     pdf = PDFWithHeaderFooter()
-    font_path = os.path.join(SYSTEM_TTFONTS, 'NotoSans-Regular.ttf')
-    pdf.add_font('NotoSans', style='', fname=font_path, uni=True)
+    pdf.add_font('NotoSans', style='', fname=FONT_PATH, uni=True)
     pdf.add_page()
     pdf.set_font('NotoSans', size=12)
 
