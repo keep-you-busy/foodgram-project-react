@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 
 from django.db.models import Sum
@@ -8,25 +9,23 @@ from recipes.models import IngredientRecipe
 INGREDIENT_WIDTH = 100
 MEASUREMENT_WIDTH = 30
 AMOUNT_WIDTH = 30
-TRANSLATION = {'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e',
-               'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k',
-               'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r',
-               'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts',
-               'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '',
-               'э': 'e', 'ю': 'yu', 'я': 'ya'}
+SYSTEM_TTFONTS = os.path.join(os.path.dirname(__file__), 'fonts')
+FONT_PATH = '/app/core/fonts/NotoSans-Regular.ttf'
 
 
 class PDFWithHeaderFooter(FPDF):
     """Класс с готовыми значениями загаловка и нижнего колонтитула."""
 
     def header(self):
-        self.set_font('Arial', 'B', 12)
-        self.cell(0, 10, 'List', 10, 1, 'C')
+        self.add_font('NotoSans', style='', fname=FONT_PATH, uni=True)
+        self.set_font('NotoSans', size=12)
+        self.cell(0, 10, 'Список покупок', 10, 1, 'C')
 
     def footer(self):
+        self.add_font('NotoSans', style='', fname=FONT_PATH, uni=True)
         self.set_y(-15)
-        self.set_font('Arial', 'I', 8)
-        self.cell(0, 10, 'Page ' + str(self.page_no()), 0, 0, 'C')
+        self.set_font('NotoSans', size=8)
+        self.cell(0, 10, 'Страница ' + str(self.page_no()), 0, 0, 'C')
 
 
 def data_prepare(user):
@@ -52,30 +51,22 @@ def data_prepare(user):
     return ingredients_data
 
 
-def russian_to_latin(input_string):
-    """Перевод с кириллицы на латиницу для кодировки latin-1."""
-    input_string.lower()
-    translated_string = input_string.translate(str.maketrans(TRANSLATION))
-    return translated_string
-
-
 def make_shopping_cart(user, temp_filename):
     """Создание списка покупок в PDF."""
     pdf = PDFWithHeaderFooter()
+    font_path = os.path.join(SYSTEM_TTFONTS, 'NotoSans-Regular.ttf')
+    pdf.add_font('NotoSans', style='', fname=font_path, uni=True)
     pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font('Arial', size=12)
+    pdf.set_font('NotoSans', size=12)
 
-    pdf.cell(INGREDIENT_WIDTH, 10, 'Ingredient', border=1)
-    pdf.cell(MEASUREMENT_WIDTH, 10, 'Unit', border=1)
-    pdf.cell(AMOUNT_WIDTH, 10, 'Amount', border=1)
+    pdf.cell(INGREDIENT_WIDTH, 10, 'Ингредиент', border=1)
+    pdf.cell(MEASUREMENT_WIDTH, 10, 'Е. И.', border=1)
+    pdf.cell(AMOUNT_WIDTH, 10, 'Количество', border=1)
     pdf.ln()
 
     ingredients_data = data_prepare(user)
 
     for name, (unit, amount) in ingredients_data.items():
-        name = russian_to_latin(name)
-        unit = russian_to_latin(unit)
         amount = str(amount)
         pdf.cell(INGREDIENT_WIDTH, 10, name, border=1)
         pdf.cell(MEASUREMENT_WIDTH, 10, unit, border=1)
