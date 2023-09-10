@@ -110,12 +110,22 @@ class RecipeSerializer(serializers.ModelSerializer):
         return check_is_flagged(Cart, 'recipe', user, obj)
 
     def get_ingredients(self, obj):
-        return obj.ingredientrecipe_set.values(
+        ingredients_values = obj.ingredientrecipe_set.values(
             'ingredient_id',
             'amount',
             name=F('ingredient__name'),
             measurement_unit=F('ingredient__measurement_unit')
         )
+        ingredients = [
+            {
+                'amount': item['amount'],
+                'id': item['ingredient_id'],
+                'name': item['name'],
+                'measurement_unit': item['measurement_unit'],
+            }
+            for item in ingredients_values
+        ]
+        return ingredients
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
