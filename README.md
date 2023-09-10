@@ -24,7 +24,7 @@
 - Выполните миграции
 ``` sudo docker-compose exec backend python manage.py migrate ```
 - Для сбора статики воспользуйтесь командами
-``` sudo docker-compose exec backend python manage.py collectstatic --no-input ```
+``` sudo docker-compose exec backend python manage.py collectstatic ```
 ``` sudo docker compose exec backend cp -r /app/collected_static/. /backend_static/static/ ``` 
 - Для загрузки базы данных ингрединтов
 ``` sudo docker-compose exec backend python manage.py loadcsvdata ```
