@@ -9,7 +9,6 @@ from recipes.models import IngredientRecipe
 INGREDIENT_WIDTH = 100
 MEASUREMENT_WIDTH = 30
 AMOUNT_WIDTH = 30
-SYSTEM_TTFONTS = os.path.join(os.path.dirname(__file__), 'fonts')
 FONT_PATH = '/app/core/fonts/NotoSans-Regular.ttf'
 
 
