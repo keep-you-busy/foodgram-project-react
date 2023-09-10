@@ -50,7 +50,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'tags__name',
     )
     empty_value_display = '-пусто-'
-    inlines = [IngredientRecipeInline, TagRecipeInline]
+    inlines = (IngredientRecipeInline, TagRecipeInline)
 
     def get_tags(self, recipe):
         return ', '.join(
