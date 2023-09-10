@@ -1,4 +1,3 @@
-import os
 from collections import defaultdict
 
 from django.db.models import Sum
