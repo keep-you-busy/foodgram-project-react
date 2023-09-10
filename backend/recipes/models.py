@@ -1,5 +1,6 @@
 from colorfield.fields import ColorField
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from users.models import User
@@ -110,13 +111,20 @@ class Recipe(models.Model):
         Tag,
         through='TagRecipe',
         verbose_name='Теги рецепта',
-        related_name='recipes'
+        related_name='recipes',
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время готовки рецепта',
         null=False,
         blank=False,
-        default=1,
+        default=settings.MIN_AMOUNT,
+        validators=(
+            MinValueValidator(
+                settings.MIN_AMOUNT,
+                message=(f'"Время готовки рецепта" не может быть '
+                         f'меньше {settings.MIN_AMOUNT}')
+            ),
+        ),
     )
 
     class Meta:
@@ -134,15 +142,21 @@ class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         verbose_name='Ингредиент',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
         null=False,
         blank=False,
-        default=1
-
+        default=settings.MIN_AMOUNT,
+        validators=(
+            MinValueValidator(
+                settings.MIN_AMOUNT,
+                message=(f'"Количество" не может быть '
+                         f'меньше {settings.MIN_AMOUNT}')
+            ),
+        ),
     )
 
     class Meta:
@@ -166,7 +180,7 @@ class TagRecipe(models.Model):
     tag = models.ForeignKey(
         Tag,
         verbose_name='Тег',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
     recipe = models.ForeignKey(
         Recipe,
