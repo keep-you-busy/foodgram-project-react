@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from recipes.forms import IngredientRecipeFormSet, TagRecipeFormSet
 from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag, TagRecipe
 
 
@@ -21,16 +22,17 @@ class IngredientRecipeInline(admin.TabularInline):
     """Форма для модели Ингредиентов, связзаной по первичному ключу."""
 
     model = IngredientRecipe
-    extra = 1
-    min_mum = 1
+    extra = 0
+    formset = IngredientRecipeFormSet
 
 
 class TagRecipeInline(admin.TabularInline):
     """Форма для модели Тега, связзаной по первичному ключу."""
 
     model = TagRecipe
-    extra = 1
-    min_mum = 1
+    extra = 0
+    min_num = 1
+    formset = TagRecipeFormSet
 
 
 @admin.register(Recipe)
